@@ -1,0 +1,88 @@
+# Function to compute the likelihood for a given probability p
+Lik <- function(p) {
+  k <- 10  # Number of successes (e.g., patients with a specific outcome)
+  n <- 30  # Total number of trials (e.g., total patients)
+  return(choose(n, k) * (p^k) * ((1 - p)^(n - k)))  # Binomial likelihood formula
+}
+
+# Test the likelihood function with different values of p
+Lik(0.25)   # Likelihood for p = 0.25
+Lik(0.4)    # Likelihood for p = 0.4
+Lik(10/30)  # Likelihood for p = observed proportion of successes
+Lik(0.35)   # Likelihood for p = 0.35
+Lik(0.28)   # Likelihood for p = 0.28
+
+# Function to compute the log-likelihood for a given probability p
+logLik <- function(p) {
+  k <- 10  # Number of successes
+  n <- 30  # Total number of trials
+  return(k * log(p) + (n - k) * log(1 - p))  # Log-likelihood formula
+}
+
+# Test the log-likelihood function with different values of p
+logLik(0.2)   # Log-likelihood for p = 0.2
+logLik(0.28)  # Log-likelihood for p = 0.28
+logLik(0.3)   # Log-likelihood for p = 0.3
+logLik(0.35)  # Log-likelihood for p = 0.35
+
+# Generate a sequence of p values between 0.01 and 0.99
+xx <- seq(0.01, 0.99, 0.01)
+
+# Compute the log-likelihood for each p value
+yy <- logLik(xx)
+
+# Plot the log-likelihood function
+plot(xx, yy, type = "l", 
+     main = "Log-Likelihood Function for p", 
+     xlab = "p (Probability of Success)", 
+     ylab = "Log-Likelihood")
+
+# Compute the likelihood for each p value
+yy2 <- Lik(xx)
+
+# Plot the likelihood function
+plot(xx, yy2, type = "l", 
+     main = "Likelihood Function for p", 
+     xlab = "p (Probability of Success)", 
+     ylab = "Likelihood")
+
+# Create a combined plot of log-likelihood and likelihood functions
+par(mfrow = c(2, 1))  # Set layout to 2 rows, 1 column
+plot(xx, yy, type = "l", 
+     main = "Log-Likelihood Function for p", 
+     xlab = "p (Probability of Success)", 
+     ylab = "Log-Likelihood")
+plot(xx, yy2, type = "l", 
+     main = "Likelihood Function for p", 
+     xlab = "p (Probability of Success)", 
+     ylab = "Likelihood")
+
+# Find the maximum log-likelihood value and corresponding p
+yy[which.max(yy)]  # Maximum log-likelihood value
+xx[which.max(yy)]  # p value corresponding to the maximum log-likelihood
+
+# Define the negative log-likelihood for optimization
+mlogLik <- function(p) {
+  -logLik(p)  # Negative log-likelihood for minimization
+}
+
+# Use the optim function to find the value of p that minimizes -log-likelihood
+optim(0.3, mlogLik)  # Start with an initial guess of p = 0.3
+
+# Load the bbmle package for maximum likelihood estimation (MLE)
+library(bbmle)
+
+# Fit the model using the mle2 function
+mle_fit <- mle2(mlogLik, start = list(p = 0.33))  # Start with p = 0.33
+
+# Summarize the MLE results
+summary(mle_fit)
+
+# Read the Geissler dataset from a file
+df_geis <- read.table('./Datasets/geissler.txt', sep = '\t', header = FALSE)
+
+# Display the first 15 rows of the dataset
+head(df_geis, 15)
+
+# Compute the column sums of the dataset
+colSums(df_geis)

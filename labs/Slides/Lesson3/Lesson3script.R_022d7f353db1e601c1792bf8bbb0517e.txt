@@ -1,0 +1,30 @@
+
+## Functions 
+
+my_fun <- function(a, b, c) {
+  return(a * b + c)
+}
+
+## Visualization
+
+# Example using the MASS dataset Pima.tr
+hist(df$bmi, main = "Histogram of BMI", xlab = "BMI", 
+     freq = FALSE, breaks =  c(15, 22, 33, 45, 65))
+# Example using the MASS dataset Pima.tr
+
+plot(df$bmi, df$age, main = "Scatter Plot of BMI vs Age", 
+     xlab = "BMI", ylab = "Age")
+
+plot(df$bmi, df$skin, main = "Scatter Plot of BMI vs skin", 
+     xlab = "BMI", ylab = "skin")
+library(MASS)
+
+plot(df$bmi[df$skin < 80 ], df$skin[df$skin < 80 ], main = "Scatter Plot of BMI vs skin", 
+     xlab = "BMI", ylab = "skin")
+
+
+plot(skin ~ bmi , data= df[df$skin<80, ],  main = "Scatter Plot of BMI vs skin", 
+     xlab = "BMI", ylab = "skin")
+
+plot(df$bmi, df$bp, main = "Scatter Plot of BMI vs bp", 
+     xlab = "BMI", ylab = "bp")

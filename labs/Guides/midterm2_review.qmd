@@ -1,0 +1,269 @@
+---
+title: "Guide Second Midterm"
+format: html
+editor: visual
+---
+
+# Solving R Exercises
+
+The second midterm is based largely on being able to compute (log)likelihoods for different distributions, estimating the MLE parameters of such distributions and be able to fit regression models as well as producing relevant visualizations of estimated distributions and assessing visually the assumptions of linear models.
+
+## Computing likelihoods
+
+When computing likelihoods you might be facing different scenarios. You might be asked to use already existing functions in R and embed them in a function we create. Alternatively, we might need to do some more work and start from the basics of how one would define mathematically a likelihood function and work up from there (binomial example with frequencies)
+
+The basic setup for the first scenario is to create a function that automatically computes the negative log-likelihood so that it can be fed into the `bbmle::mle2()` function. We have a look at this first.
+
+### Ex 4 (ME)
+
+#### Part 1
+
+Read the dataset FirDBHFec_sum contained in the package emdbook.
+
+1\. Notice that for several observations of the dataset, the variable DBH has missing values; hence, clean the dataset of those observations.
+
+```{r}
+library(emdbook)
+
+FirDBHFec_sum <- FirDBHFec_sum[complete.cases(FirDBHFec_sum),]
+```
+
+#### Part 2
+
+Plot a histogram of the variable DBH (1)
+
+```{r}
+hist(FirDBHFec_sum$DBH)
+```
+
+#### Part 3
+
+Assuming that DBH are independent observations from a Gamma distribution, estimate the two parameters α and σ with the maximum likelihood method, using the package `bbmle`.
+
+Feel free to use the command dgamma to compute it.
+
+```{r, warning=FALSE}
+library(bbmle)
+
+neg_log_likel <- function(alpha, sigma){
+  res <- -sum(dgamma(FirDBHFec_sum$DBH, shape = alpha, scale = sigma, log = TRUE))
+  return(res)
+}
+
+bbmle::mle2(neg_log_likel, start = list(alpha = 10, sigma = .9))
+```
+
+Now in this case we see that the estimated parameters for alpha and sigma are 10.3 and 0.8 respectively. Additionally, notice a few things:
+
+1.  data are passed directly as the x argument into `dgamma` and R automatically performs vectorized operations on each value of the DBH column. Basically, it produces a log probability for each value of DBH. For this reason then `mle2` is capable of solving the optimization problem
+2.  the negative log likelihood is simply computed as the sum of all the log probabilities and then it is made negative by specifying the - in front of the sum
+3.  inside mle2 the start parameters should be a guess and tell the function where it should start looking for the minimum of the negative log likelihood
+
+In previous lectures we also solved exercises that were slightly different (see Geissler binomial example). One such examples is reported below and it often concerns exercises with discrete distributions and their associated frequencies:
+
+##### EX 5 ES11
+
+We believe that the number of bites received by a subject follows a Poisson distribution of unknown parameter λ. Using the data.frame obtained in the previous point, write down the log-likelihood function of the parameter λ and find the maximum likelihood estimate of λ, and its 95%−confidence interval.
+
+```{r, include=FALSE, echo=FALSE}
+Mosquitos <- read.csv("~/Desktop/UniTrento/Courses/Statistical methods/labs/Ex11/Mosquitos.csv")
+
+str(Mosquitos)
+
+Mosquitos$trt.mosq <- as.factor(Mosquitos$trt.mosq)
+
+boxplot(Mosquitos$y.mosq ~ Mosquitos$trt.mosq,
+        main = "Mosquito landing rate by treatment",
+        xlab = "Treatment type",
+        ylab = "landing rate")
+
+mod <- lm(y.mosq ~ trt.mosq, data = Mosquitos)
+summary(mod) #the baseline is mosquito 1 so all other contrasts have to be interpreted accordingly
+#the only treatment which appears to be significantly different from treatment 1 is treatment 4, and it seems to be having a lower mean compared to that of group 1
+
+df <- Mosquitos
+
+df$y.mosq <- round(df$y.mosq)
+
+#df$trt.mosq <- as.numeric(df$trt.mosq)
+
+df <- as.data.frame(table(df$y.mosq))
+
+names(df) <- c("n_bites", "freq")
+
+df$n_bites <- as.numeric(df$n_bites)
+
+df$rel_freq <- df$freq/sum(df$freq)
+```
+
+the first five rows of the dataset (df) are presented below:
+
+```{r}
+head(df)
+```
+
+And the associated negative log-likelihood function associated to the solution is the one reported below
+
+```{r}
+log_likel_freq <- function(lambda){
+  bites <- as.numeric(df$n_bites)
+  subjects <- df$freq
+  
+  -sum(dpois(bites, lambda, log = TRUE) * subjects)
+}
+
+(ml_lambda <- mle2(log_likel_freq, start = list(lambda = 1)))
+```
+
+From the example above we learn that when working with frequencies we want to multiply by the number of times a specific probability needs to be computed (e.g., multiply by the frequency each number of bites appears in the sample)
+
+```{r}
+confint(ml_lambda, level = .95)
+```
+
+## Overlaying curves
+
+### Ex 5 (ES11)
+
+Make an appropriate plot showing the data, and the estimated probabilities.
+
+Do you think that the proposed Poisson model is correct?
+
+```{r}
+x <- seq(min(df$n_bites), max(df$n_bites))
+y <- dpois(x, lambda = ml_lambda@coef)
+hist(as.numeric(df$n_bites), freq = F, breaks = 5, ylim = c(0,.2))
+lines(x,y)
+```
+
+We pretty much always use the `lines()` function to do this kind of work. Just need to specify an x,y numeric vector as its argument to use it.
+
+## Fitting linear models
+
+We can fit linear models simply by using the `lm` function in R and specifying the variables of interests separating the dependent variable and the predictors by a \~.
+
+```{r}
+library(MASS)
+df <- MASS::Cars93[complete.cases(MASS::Cars93),]
+
+head(df)
+```
+
+```{r}
+my_lm <- lm(Price ~ Horsepower, data = df)
+summary(my_lm)
+```
+
+Then we can get a `summary` of the model to check some important statistics about it including the $R^2$, the result of the F test for overall model significance and the t-test for the individual predictor significance.
+
+### Diagnosis of residuals
+
+```{r}
+par(mfrow = c(2,2))
+plot(my_lm)
+```
+
+Then when we call `plot` on it we see a visual summary of the residuals to check if they violate any assumptions.
+
+1.  Use the first one to see if there is any trend in how the residuals are distributed (they should be normally distributed with mean 0 so no particular trend should be seen in this plot, otherwise we have a problem)
+2.  the qqplot shows how much the residual distribution deviates from a standard normal distribution, with points closer to the line indicating a larger agreement to the standard normal
+3.  the scale location is useful to check the assumption of homoscedasticity and to see if the variance of the residuals change for different values of the predictors. A horizontal line means the assumption of homoscedasticity is respected
+4.  Standardized residuals vs. ‘leverage’ of points. Leverage is a measure of how much the coefficients in the regression model would change if a particular observation was removed from the dataset. Points outside the red dotted line may be dangerous outliers.
+
+### Plotting (simple) regression line
+
+Also if we want to get the regression line to show in a specific plot containing the data we can use `abline`.
+
+::: callout-caution
+This only works in the case of simple regression where the output is composed of exactly one intercept and one slope parameter. We will see how to do this also in the case of a multiple regression, but we will use a different approach.
+:::
+
+```{r}
+plot(Price ~ Horsepower, data = df)
+abline(my_lm, col = "red", lwd = 3)
+text(250,25,"Estimated Regression line", col = "red")
+```
+
+### Multiple regression
+
+Let's see the case of a multiple regression now:
+
+```{r}
+my_lm2 <- lm(Price~Horsepower + Length, data = df)
+summary(my_lm2)
+```
+
+To produce a plot of this we first need to get predictions out of the model and those will be plotted along the original values. This is done by following these steps:
+
+```{r}
+df_pred <- data.frame("Horsepower" = seq(min(df$Horsepower), max(df$Horsepower), length.out=100),
+                      "Length" = seq(min(df$Length), max(df$Length), length.out = 100))
+
+df_pred$predictions <- predict(my_lm2, df_pred)
+
+plot(df$Price)
+lines(df_pred$predictions, col = "red")
+```
+
+Notice that in the example above the columns in the new dataframe must be named exactly as the original columns that were used to fit the model, otherwise you'll get an `objectNotFound` error out of it.
+
+Even if it does not make much sense in this case we can try and fit a polynomial regression model by using the `poly` function.
+
+```{r}
+my_lm3 <- lm(Price~poly(Horsepower,2) + Length, data = df)
+summary(my_lm3)
+```
+
+This model will use a degree two polynomial of Horsepower along with its degree one form. We can plot this out using the model same lines of code above.
+
+```{r, echo=FALSE, include=FALSE}
+df_pred <- data.frame("Horsepower" = seq(min(df$Horsepower), max(df$Horsepower), length.out=100),
+                      "Length" = seq(min(df$Length), max(df$Length), length.out = 100))
+
+df_pred$predictions <- predict(my_lm3, df_pred)
+
+plot(df$Price)
+lines(df_pred$predictions, col = "red")
+```
+
+```{r}
+anova(my_lm)
+```
+
+Here with `anova` we are testing simply the $H_0$ that all estimated coefficients are 0 compared to the $H_1$ being $\neg H_0$ (at least one is not zero). A small enough $p$ indicates that we can reject $H_0$.
+
+### Comparing models
+
+We can also compare models by comparing their Adj. $R^2$ (higher better), AIC (smaller better), BIC (smaller better) statistics.
+
+```{r}
+AIC(my_lm, my_lm2)
+```
+
+```{r}
+BIC(my_lm, my_lm2)
+```
+
+```{r}
+summary(my_lm)
+```
+
+```{r}
+summary(my_lm2)
+```
+
+We can also compare models using `anova`. In this way we will always be testing the following two hypotheses:
+
+-   $H_0$: simpler model (less predictors) is better
+
+-   $H_1$: more complex model is better
+
+```{r}
+anova(my_lm, my_lm2)
+```
+
+For instance, here we see that the $p$ is not small enough to reject $H_0$ and so we cannot say that the more complex model is better!
+
+::: callout-tip
+You can understand which model is the simpler one in the table simply by looking at the residuals degrees of freedom. Knowing that those are always equal to $n-p-1$, where $p$ is the number of predictors, helps in understanding that the lower residuals' degrees of freedom will be always associated to the more complex model (i.e. the model with the higher $p$)
+:::

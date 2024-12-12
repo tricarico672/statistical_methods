@@ -1,0 +1,999 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.5.57">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>Guide Second Midterm</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="midterm2_review_files/libs/clipboard/clipboard.min.js"></script>
+<script src="midterm2_review_files/libs/quarto-html/quarto.js"></script>
+<script src="midterm2_review_files/libs/quarto-html/popper.min.js"></script>
+<script src="midterm2_review_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="midterm2_review_files/libs/quarto-html/anchor.min.js"></script>
+<link href="midterm2_review_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="midterm2_review_files/libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="midterm2_review_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="midterm2_review_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="midterm2_review_files/libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+</head>
+
+<body class="fullcontent">
+
+<div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
+
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Guide Second Midterm</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<section id="solving-r-exercises" class="level1">
+<h1>Solving R Exercises</h1>
+<p>The second midterm is based largely on being able to compute (log)likelihoods for different distributions, estimating the MLE parameters of such distributions and be able to fit regression models as well as producing relevant visualizations of estimated distributions and assessing visually the assumptions of linear models.</p>
+<section id="computing-likelihoods" class="level2">
+<h2 class="anchored" data-anchor-id="computing-likelihoods">Computing likelihoods</h2>
+<p>When computing likelihoods you might be facing different scenarios. You might be asked to use already existing functions in R and embed them in a function we create. Alternatively, we might need to do some more work and start from the basics of how one would define mathematically a likelihood function and work up from there (binomial example with frequencies)</p>
+<p>The basic setup for the first scenario is to create a function that automatically computes the negative log-likelihood so that it can be fed into the <code>bbmle::mle2()</code> function. We have a look at this first.</p>
+<section id="ex-4-me" class="level3">
+<h3 class="anchored" data-anchor-id="ex-4-me">Ex 4 (ME)</h3>
+<section id="part-1" class="level4">
+<h4 class="anchored" data-anchor-id="part-1">Part 1</h4>
+<p>Read the dataset FirDBHFec_sum contained in the package emdbook.</p>
+<p>1. Notice that for several observations of the dataset, the variable DBH has missing values; hence, clean the dataset of those observations.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(emdbook)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>FirDBHFec_sum <span class="ot">&lt;-</span> FirDBHFec_sum[<span class="fu">complete.cases</span>(FirDBHFec_sum),]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="part-2" class="level4">
+<h4 class="anchored" data-anchor-id="part-2">Part 2</h4>
+<p>Plot a histogram of the variable DBH (1)</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">hist</span>(FirDBHFec_sum<span class="sc">$</span>DBH)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="midterm2_review_files/figure-html/unnamed-chunk-2-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="part-3" class="level4">
+<h4 class="anchored" data-anchor-id="part-3">Part 3</h4>
+<p>Assuming that DBH are independent observations from a Gamma distribution, estimate the two parameters α and σ with the maximum likelihood method, using the package <code>bbmle</code>.</p>
+<p>Feel free to use the command dgamma to compute it.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(bbmle)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Loading required package: stats4</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>neg_log_likel <span class="ot">&lt;-</span> <span class="cf">function</span>(alpha, sigma){</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  res <span class="ot">&lt;-</span> <span class="sc">-</span><span class="fu">sum</span>(<span class="fu">dgamma</span>(FirDBHFec_sum<span class="sc">$</span>DBH, <span class="at">shape =</span> alpha, <span class="at">scale =</span> sigma, <span class="at">log =</span> <span class="cn">TRUE</span>))</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(res)</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>bbmle<span class="sc">::</span><span class="fu">mle2</span>(neg_log_likel, <span class="at">start =</span> <span class="fu">list</span>(<span class="at">alpha =</span> <span class="dv">10</span>, <span class="at">sigma =</span> .<span class="dv">9</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+bbmle::mle2(minuslogl = neg_log_likel, start = list(alpha = 10, 
+    sigma = 0.9))
+
+Coefficients:
+     alpha      sigma 
+10.3014908  0.8030027 
+
+Log-likelihood: -725.42 </code></pre>
+</div>
+</div>
+<p>Now in this case we see that the estimated parameters for alpha and sigma are 10.3 and 0.8 respectively. Additionally, notice a few things:</p>
+<ol type="1">
+<li>data are passed directly as the x argument into <code>dgamma</code> and R automatically performs vectorized operations on each value of the DBH column. Basically, it produces a log probability for each value of DBH. For this reason then <code>mle2</code> is capable of solving the optimization problem</li>
+<li>the negative log likelihood is simply computed as the sum of all the log probabilities and then it is made negative by specifying the - in front of the sum</li>
+<li>inside mle2 the start parameters should be a guess and tell the function where it should start looking for the minimum of the negative log likelihood</li>
+</ol>
+<p>In previous lectures we also solved exercises that were slightly different (see Geissler binomial example). One such examples is reported below and it often concerns exercises with discrete distributions and their associated frequencies:</p>
+<section id="ex-5-es11" class="level5">
+<h5 class="anchored" data-anchor-id="ex-5-es11">EX 5 ES11</h5>
+<p>We believe that the number of bites received by a subject follows a Poisson distribution of unknown parameter λ. Using the data.frame obtained in the previous point, write down the log-likelihood function of the parameter λ and find the maximum likelihood estimate of λ, and its 95%−confidence interval.</p>
+<p>the first five rows of the dataset (df) are presented below:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(df)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>  n_bites freq    rel_freq
+1       1    1 0.006666667
+2       2    8 0.053333333
+3       3   11 0.073333333
+4       4   21 0.140000000
+5       5   18 0.120000000
+6       6   17 0.113333333</code></pre>
+</div>
+</div>
+<p>And the associated negative log-likelihood function associated to the solution is the one reported below</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>log_likel_freq <span class="ot">&lt;-</span> <span class="cf">function</span>(lambda){</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>  bites <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>(df<span class="sc">$</span>n_bites)</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>  subjects <span class="ot">&lt;-</span> df<span class="sc">$</span>freq</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>  <span class="sc">-</span><span class="fu">sum</span>(<span class="fu">dpois</span>(bites, lambda, <span class="at">log =</span> <span class="cn">TRUE</span>) <span class="sc">*</span> subjects)</span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>(ml_lambda <span class="ot">&lt;-</span> <span class="fu">mle2</span>(log_likel_freq, <span class="at">start =</span> <span class="fu">list</span>(<span class="at">lambda =</span> <span class="dv">1</span>)))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+mle2(minuslogl = log_likel_freq, start = list(lambda = 1))
+
+Coefficients:
+  lambda 
+7.439999 
+
+Log-likelihood: -426.52 </code></pre>
+</div>
+</div>
+<p>From the example above we learn that when working with frequencies we want to multiply by the number of times a specific probability needs to be computed (i.e.&nbsp;multiply by the frequency each number of bites appears in the sample)</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">confint</span>(ml_lambda, <span class="at">level =</span> .<span class="dv">95</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>   2.5 %   97.5 % 
+7.011991 7.885094 </code></pre>
+</div>
+</div>
+</section>
+</section>
+</section>
+</section>
+<section id="overlaying-curves" class="level2">
+<h2 class="anchored" data-anchor-id="overlaying-curves">Overlaying curves</h2>
+<section id="ex-5-es11-1" class="level3">
+<h3 class="anchored" data-anchor-id="ex-5-es11-1">Ex 5 (ES11)</h3>
+<p>Make an appropriate plot showing the data, and the estimated probabilities.</p>
+<p>Do you think that the proposed Poisson model is correct?</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="fu">seq</span>(<span class="fu">min</span>(df<span class="sc">$</span>n_bites), <span class="fu">max</span>(df<span class="sc">$</span>n_bites))</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>y <span class="ot">&lt;-</span> <span class="fu">dpois</span>(x, <span class="at">lambda =</span> ml_lambda<span class="sc">@</span>coef)</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a><span class="fu">hist</span>(<span class="fu">as.numeric</span>(df<span class="sc">$</span>n_bites), <span class="at">freq =</span> F, <span class="at">breaks =</span> <span class="dv">5</span>, <span class="at">ylim =</span> <span class="fu">c</span>(<span class="dv">0</span>,.<span class="dv">2</span>))</span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a><span class="fu">lines</span>(x,y)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="midterm2_review_files/figure-html/unnamed-chunk-8-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>We pretty much always use the <code>lines()</code> function to do this kind of work. Just need to specify an x,y numeric vector as its argument to use it.</p>
+</section>
+</section>
+<section id="fitting-linear-models" class="level2">
+<h2 class="anchored" data-anchor-id="fitting-linear-models">Fitting linear models</h2>
+<p>We can fit linear models simply by using the <code>lm</code> function in R and specifying the variables of interests separating the dependent variable and the predictors by a ~.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(MASS)</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>df <span class="ot">&lt;-</span> MASS<span class="sc">::</span>Cars93[<span class="fu">complete.cases</span>(MASS<span class="sc">::</span>Cars93),]</span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(df)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>  Manufacturer   Model    Type Min.Price Price Max.Price MPG.city MPG.highway
+1        Acura Integra   Small      12.9  15.9      18.8       25          31
+2        Acura  Legend Midsize      29.2  33.9      38.7       18          25
+3         Audi      90 Compact      25.9  29.1      32.3       20          26
+4         Audi     100 Midsize      30.8  37.7      44.6       19          26
+5          BMW    535i Midsize      23.7  30.0      36.2       22          30
+6        Buick Century Midsize      14.2  15.7      17.3       22          31
+             AirBags DriveTrain Cylinders EngineSize Horsepower  RPM
+1               None      Front         4        1.8        140 6300
+2 Driver &amp; Passenger      Front         6        3.2        200 5500
+3        Driver only      Front         6        2.8        172 5500
+4 Driver &amp; Passenger      Front         6        2.8        172 5500
+5        Driver only       Rear         4        3.5        208 5700
+6        Driver only      Front         4        2.2        110 5200
+  Rev.per.mile Man.trans.avail Fuel.tank.capacity Passengers Length Wheelbase
+1         2890             Yes               13.2          5    177       102
+2         2335             Yes               18.0          5    195       115
+3         2280             Yes               16.9          5    180       102
+4         2535             Yes               21.1          6    193       106
+5         2545             Yes               21.1          4    186       109
+6         2565              No               16.4          6    189       105
+  Width Turn.circle Rear.seat.room Luggage.room Weight  Origin          Make
+1    68          37           26.5           11   2705 non-USA Acura Integra
+2    71          38           30.0           15   3560 non-USA  Acura Legend
+3    67          37           28.0           14   3375 non-USA       Audi 90
+4    70          37           31.0           17   3405 non-USA      Audi 100
+5    69          39           27.0           13   3640 non-USA      BMW 535i
+6    69          41           28.0           16   2880     USA Buick Century</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>my_lm <span class="ot">&lt;-</span> <span class="fu">lm</span>(Price <span class="sc">~</span> Horsepower, <span class="at">data =</span> df)</span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(my_lm)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+lm(formula = Price ~ Horsepower, data = df)
+
+Residuals:
+     Min       1Q   Median       3Q      Max 
+-17.9493  -2.8548  -0.6301   1.8289  30.8969 
+
+Coefficients:
+            Estimate Std. Error t value Pr(&gt;|t|)    
+(Intercept) -2.32148    2.00202   -1.16     0.25    
+Horsepower   0.15357    0.01345   11.42   &lt;2e-16 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Residual standard error: 6.18 on 80 degrees of freedom
+Multiple R-squared:  0.6198,    Adjusted R-squared:  0.615 
+F-statistic: 130.4 on 1 and 80 DF,  p-value: &lt; 2.2e-16</code></pre>
+</div>
+</div>
+<p>Then we can get a <code>summary</code> of the model to check some important statistics about it including the <span class="math inline">\(R^2\)</span>, the result of the F test for overall model significance and the t-test for the individual predictor significance.</p>
+<section id="diagnosis-of-residuals" class="level3">
+<h3 class="anchored" data-anchor-id="diagnosis-of-residuals">Diagnosis of residuals</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="fu">par</span>(<span class="at">mfrow =</span> <span class="fu">c</span>(<span class="dv">2</span>,<span class="dv">2</span>))</span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(my_lm)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="midterm2_review_files/figure-html/unnamed-chunk-11-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Then when we call <code>plot</code> on it we see a visual summary of the residuals to check if they violate any assumptions.</p>
+<ol type="1">
+<li>Use the first one to see if there is any trend in how the residuals are distributed (they should be normally distributed with mean 0 so no particular trend should be seen in this plot, otherwise we have a problem)</li>
+<li>the qqplot shows how much the residual distribution deviates from a standard normal distribution, with points closer to the line indicating a larger agreement to the standard normal</li>
+<li>the scale location is useful to check the assumption of homoscedasticity and to see if the variance of the residuals change for different values of the predictors. A horizontal line means the assumption of homoscedasticity is respected</li>
+<li>Standardized residuals vs.&nbsp;‘leverage’ of points. Leverage is a measure of how much the coefficients in the regression model would change if a particular observation was removed from the dataset. Points outside the red dotted line may be dangerous outliers.</li>
+</ol>
+</section>
+<section id="plotting-simple-regression-line" class="level3">
+<h3 class="anchored" data-anchor-id="plotting-simple-regression-line">Plotting (simple) regression line</h3>
+<p>Also if we want to get the regression line to show in a specific plot containing the data we can use <code>abline</code>.</p>
+<div class="callout callout-style-default callout-caution callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Caution
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>This only works in the case of simple regression where the output is composed of exactly one intercept and one slope parameter. We will see how to do this also in the case of a multiple regression, but we will use a different approach.</p>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(Price <span class="sc">~</span> Horsepower, <span class="at">data =</span> df)</span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a><span class="fu">abline</span>(my_lm, <span class="at">col =</span> <span class="st">"red"</span>, <span class="at">lwd =</span> <span class="dv">3</span>)</span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a><span class="fu">text</span>(<span class="dv">250</span>,<span class="dv">25</span>,<span class="st">"Estimated Regression line"</span>, <span class="at">col =</span> <span class="st">"red"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="midterm2_review_files/figure-html/unnamed-chunk-12-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="multiple-regression" class="level3">
+<h3 class="anchored" data-anchor-id="multiple-regression">Multiple regression</h3>
+<p>Let’s see the case of a multiple regression now:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>my_lm2 <span class="ot">&lt;-</span> <span class="fu">lm</span>(Price<span class="sc">~</span>Horsepower <span class="sc">+</span> Length, <span class="at">data =</span> df)</span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(my_lm2)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+lm(formula = Price ~ Horsepower + Length, data = df)
+
+Residuals:
+     Min       1Q   Median       3Q      Max 
+-16.2229  -2.9482  -0.4636   1.8152  31.4554 
+
+Coefficients:
+             Estimate Std. Error t value Pr(&gt;|t|)    
+(Intercept) -10.26441    9.40283  -1.092    0.278    
+Horsepower    0.14379    0.01759   8.174    4e-12 ***
+Length        0.05084    0.05880   0.865    0.390    
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Residual standard error: 6.189 on 79 degrees of freedom
+Multiple R-squared:  0.6233,    Adjusted R-squared:  0.6138 
+F-statistic: 65.37 on 2 and 79 DF,  p-value: &lt; 2.2e-16</code></pre>
+</div>
+</div>
+<p>To produce a plot of this we first need to get predictions out of the model and those will be plotted along the original values. This is done by following these steps:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>df_pred <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="st">"Horsepower"</span> <span class="ot">=</span> <span class="fu">seq</span>(<span class="fu">min</span>(df<span class="sc">$</span>Horsepower), <span class="fu">max</span>(df<span class="sc">$</span>Horsepower), <span class="at">length.out=</span><span class="dv">100</span>),</span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>                      <span class="st">"Length"</span> <span class="ot">=</span> <span class="fu">seq</span>(<span class="fu">min</span>(df<span class="sc">$</span>Length), <span class="fu">max</span>(df<span class="sc">$</span>Length), <span class="at">length.out =</span> <span class="dv">100</span>))</span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>df_pred<span class="sc">$</span>predictions <span class="ot">&lt;-</span> <span class="fu">predict</span>(my_lm2, df_pred)</span>
+<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(df<span class="sc">$</span>Price)</span>
+<span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a><span class="fu">lines</span>(df_pred<span class="sc">$</span>predictions, <span class="at">col =</span> <span class="st">"red"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="midterm2_review_files/figure-html/unnamed-chunk-14-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Notice that in the example above the columns in the new dataframe must be named exactly as the original columns that were used to fit the model, otherwise you’ll get an <code>objectNotFound</code> error out of it.</p>
+<p>Even if it does not make much sense in this case we can try and fit a polynomial regression model by using the <code>poly</code> function.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>my_lm3 <span class="ot">&lt;-</span> <span class="fu">lm</span>(Price<span class="sc">~</span><span class="fu">poly</span>(Horsepower,<span class="dv">2</span>) <span class="sc">+</span> Length, <span class="at">data =</span> df)</span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(my_lm3)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+lm(formula = Price ~ poly(Horsepower, 2) + Length, data = df)
+
+Residuals:
+     Min       1Q   Median       3Q      Max 
+-14.4344  -3.2263  -0.2096   1.6007  31.1519 
+
+Coefficients:
+                     Estimate Std. Error t value Pr(&gt;|t|)    
+(Intercept)          14.54143   12.28573   1.184    0.240    
+poly(Horsepower, 2)1 68.32956    8.57593   7.968 1.09e-11 ***
+poly(Horsepower, 2)2 -5.66526    7.04927  -0.804    0.424    
+Length                0.02527    0.06697   0.377    0.707    
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Residual standard error: 6.203 on 78 degrees of freedom
+Multiple R-squared:  0.6264,    Adjusted R-squared:  0.6121 
+F-statistic:  43.6 on 3 and 78 DF,  p-value: &lt; 2.2e-16</code></pre>
+</div>
+</div>
+<p>This model will use a degree two polynomial of Horsepower along with its degree one form. We can plot this out using the model same lines of code above.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="fu">anova</span>(my_lm)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Analysis of Variance Table
+
+Response: Price
+           Df Sum Sq Mean Sq F value    Pr(&gt;F)    
+Horsepower  1 4979.3  4979.3   130.4 &lt; 2.2e-16 ***
+Residuals  80 3054.9    38.2                      
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</code></pre>
+</div>
+</div>
+<p>Here with <code>anova</code> we are testing simply the <span class="math inline">\(H_0\)</span> that all estimated coefficients are 0 compared to the <span class="math inline">\(H_1\)</span> being <span class="math inline">\(\neg H_0\)</span> (at least one is not zero). A small enough <span class="math inline">\(p\)</span> indicates that we can reject <span class="math inline">\(H_0\)</span>.</p>
+</section>
+<section id="comparing-models" class="level3">
+<h3 class="anchored" data-anchor-id="comparing-models">Comparing models</h3>
+<p>We can also compare models by comparing their Adj. <span class="math inline">\(R^2\)</span> (higher better), AIC (smaller better), BIC (smaller better) statistics.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="fu">AIC</span>(my_lm, my_lm2)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>       df      AIC
+my_lm   3 535.3641
+my_lm2  4 536.5918</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="fu">BIC</span>(my_lm, my_lm2)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>       df      BIC
+my_lm   3 542.5843
+my_lm2  4 546.2187</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(my_lm)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+lm(formula = Price ~ Horsepower, data = df)
+
+Residuals:
+     Min       1Q   Median       3Q      Max 
+-17.9493  -2.8548  -0.6301   1.8289  30.8969 
+
+Coefficients:
+            Estimate Std. Error t value Pr(&gt;|t|)    
+(Intercept) -2.32148    2.00202   -1.16     0.25    
+Horsepower   0.15357    0.01345   11.42   &lt;2e-16 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Residual standard error: 6.18 on 80 degrees of freedom
+Multiple R-squared:  0.6198,    Adjusted R-squared:  0.615 
+F-statistic: 130.4 on 1 and 80 DF,  p-value: &lt; 2.2e-16</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(my_lm2)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+lm(formula = Price ~ Horsepower + Length, data = df)
+
+Residuals:
+     Min       1Q   Median       3Q      Max 
+-16.2229  -2.9482  -0.4636   1.8152  31.4554 
+
+Coefficients:
+             Estimate Std. Error t value Pr(&gt;|t|)    
+(Intercept) -10.26441    9.40283  -1.092    0.278    
+Horsepower    0.14379    0.01759   8.174    4e-12 ***
+Length        0.05084    0.05880   0.865    0.390    
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Residual standard error: 6.189 on 79 degrees of freedom
+Multiple R-squared:  0.6233,    Adjusted R-squared:  0.6138 
+F-statistic: 65.37 on 2 and 79 DF,  p-value: &lt; 2.2e-16</code></pre>
+</div>
+</div>
+<p>We can also compare models using <code>anova</code>. In this way we will always be testing the following two hypotheses:</p>
+<ul>
+<li><p><span class="math inline">\(H_0\)</span>: simpler model (less predictors) is better</p></li>
+<li><p><span class="math inline">\(H_1\)</span>: more complex model is better</p></li>
+</ul>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="fu">anova</span>(my_lm, my_lm2)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Analysis of Variance Table
+
+Model 1: Price ~ Horsepower
+Model 2: Price ~ Horsepower + Length
+  Res.Df    RSS Df Sum of Sq      F Pr(&gt;F)
+1     80 3054.9                           
+2     79 3026.3  1    28.638 0.7476 0.3899</code></pre>
+</div>
+</div>
+<p>For instance, here we see that the <span class="math inline">\(p\)</span> is not small enough to reject <span class="math inline">\(H_0\)</span> and so we cannot say that the more complex model is better!</p>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Tip
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>You can understand which model is the simpler one in the table simply by looking at the residuals degrees of freedom. Knowing that those are always equal to <span class="math inline">\(n-p-1\)</span>, where <span class="math inline">\(p\)</span> is the number of predictors, helps in understanding that the lower residuals’ degrees of freedom will be always associated to the more complex model (i.e.&nbsp;the model with the higher <span class="math inline">\(p\)</span>)</p>
+</div>
+</div>
+</section>
+</section>
+</section>
+
+</main>
+<!-- /main column -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const onCopySuccess = function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  }
+  const getTextToCopy = function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+    text: getTextToCopy
+  });
+  clipboard.on('success', onCopySuccess);
+  if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+    // For code content inside modals, clipBoardJS needs to be initialized with a container option
+    // TODO: Check when it could be a function (https://github.com/zenorocha/clipboard.js/issues/860)
+    const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+      text: getTextToCopy,
+      container: window.document.getElementById('quarto-embedded-source-code-modal')
+    });
+    clipboardModal.on('success', onCopySuccess);
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp('/' + window.location.host + '/');
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      // TODO in 1.5, we should make sure this works without a callout special case
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

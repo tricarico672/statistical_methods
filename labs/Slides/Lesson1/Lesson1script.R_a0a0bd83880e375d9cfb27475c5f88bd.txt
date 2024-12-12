@@ -1,0 +1,77 @@
+## Lesson 1 
+## Class notes
+
+2 + 3  # Simple addition, result is 5.
+
+getwd()  # Get the current working directory, returns the folder path where R is running.
+
+3 / 2  # Division, result is 1.5.
+3 %/% 2  # Integer division, result is 1 (quotient of 3 divided by 2).
+3 %% 2  # Modulus operation, result is 1 (remainder of 3 divided by 2).
+
+log(2.7, base = 3)  # Logarithm of 2.7 with base 3.
+exp(1)  # The exponential function (e^1), result is approximately 2.718.
+
+x <- 6  # Assign the value 6 to variable `x`.
+x  # Print the value of `x`, which is 6.
+
+x <- 5  # Reassign the value 5 to variable `x`.
+
+xx <- 'ABCD'  # Assign the string 'ABCD' to variable `xx`.
+xx  # Print the value of `xx`, which is 'ABCD'.
+
+x2 <- FALSE  # Assign the boolean value FALSE to variable `x2`.
+x2  # Print the value of `x2`, which is FALSE.
+
+x3 <- ABCD  # This will generate an error because `ABCD` is not a valid object unless defined.
+
+pi  # The constant pi, approximately 3.141593.
+
+6 > 10  # Logical test, returns FALSE because 6 is not greater than 10.
+6 <= 10  # Logical test, returns TRUE because 6 is less than or equal to 10.
+
+y <- c(1, 2, 3, 4)  # Create a numeric vector `y`.
+y[1]  # Access the first element of `y`, which is 1.
+
+y1 <- c(3, 5, 7, 9)  # Create another numeric vector `y1`.
+y1[1]  # Access the first element of `y1`, which is 3.
+y1[2:3]  # Access the second and third elements of `y1`, which are 5 and 7.
+
+y1  # Print the entire vector `y1`, which is c(3, 5, 7, 9).
+t(y1)  # Transpose `y1`. This will convert the row vector into a column vector.
+
+a <- cbind(c(1, 2, 3), c(4, 5, 6))  # Combine two vectors column-wise, creates a 3x2 matrix.
+a  # Print matrix `a`.
+dim(a)  # Get the dimensions of matrix `a`, which is 3 rows and 2 columns.
+
+b <- rbind(c(1, 2, 3), c(4, 5, 6))  # Combine two vectors row-wise, creates a 2x3 matrix.
+b  # Print matrix `b`.
+dim(b)  # Get the dimensions of matrix `b`, which is 2 rows and 3 columns.
+
+b[2,2]  # Access the element in the second row and second column of `b`, which is 5.
+
+names <- c("Francesco", "Sofia", "Alessandro")  # Create a character vector of names.
+names[1]  # Access the first name in `names`, which is "Francesco".
+
+c <- paste0("Francesco", "Sofia")  # Concatenate two strings without spaces, result is "FrancescoSofia".
+c  # Print the concatenated string.
+
+d <- c("Francesco", 2)  # Create a mixed vector with a string and a number. All converted to strings
+
+L3 <- LETTERS[1:3]  # Create a vector of the first three letters of the alphabet (A, B, C).
+fac <- sample(L3, 10, replace = TRUE)  # Generate a random sample of 10 letters from `L3` with replacement.
+
+sample(LETTERS, 10)  # Generate a random sample of 10 letters from the alphabet (A-Z).
+
+data.frame(x = 1, y = 1:10, fac = fac)  # Create a data frame with columns `x`, `y` (values 1 to 10), and `fac` (random letters).
+
+Pima.tr  # This references a built-in dataset from the MASS package (if loaded) related to Pima Indian diabetes.
+
+MASS::anorexia  # Access the 'anorexia' dataset from the MASS package.
+
+install.packages("hflights")  # Install the "hflights" package (this package contains flight data).
+library(hflights)  # Load the "hflights" package.
+hflights  # View the "hflights" dataset (contains flight data from Houston).
+
+# Get data from website
+df <- read.csv('https://web.stanford.edu/class/archive/cs/cs109/cs109.1166/stuff/titanic.csv')  # Read the Titanic dataset from the provided URL and store it in `df`.

@@ -1,0 +1,86 @@
+# Lesson 2
+## Class notes
+
+# Load necessary library
+library(MASS)  # Load the MASS package for datasets and functions
+
+# Load Pima.tr dataset from MASS package
+df <- MASS::Pima.tr  # Load the Pima.tr dataset into df
+View(df)  # View the dataset in a spreadsheet-like format
+
+# Load the BodyTemperature dataset from local system
+df_temp <- read.table(file = './Datasets/BodyTemperature.txt', header = TRUE)  # Read the BodyTemperature dataset from a local file
+View(df_temp)  # View the dataset
+
+# Load Titanic dataset from local file
+df_titanic <- read.csv(file = './Datasets/titanic.csv')  # Read the Titanic dataset from a local CSV file
+# View(df_titanic)  # View the dataset (commented out)
+
+# Load Titanic dataset from web
+df_from_web <- read.csv('https://web.stanford.edu/class/archive/cs/cs109/cs109.1166/stuff/titanic.csv')  # Read the Titanic dataset from a web URL
+# View(df_from_web)  # View the dataset (commented out)
+
+# Summary statistics of Pima.tr dataset
+summary(df)  # Display summary statistics of the Pima.tr dataset
+
+# View the first and last rows of the dataset
+head(df)  # Display the first 6 rows of the dataset
+tail(df)  # Display the last 6 rows of the dataset
+
+# Dataset dimensions and column names
+dim(df)  # Get the dimensions of the dataset (rows and columns)
+names(df)  # Get the column names of the dataset
+
+# Let's look at an example
+data <- c("Male", "Female", "Male", "Female", "Male")  # Create a character vector
+factor_data <- as.factor(data)  # Convert the character vector to a factor
+factor_data  # Display the factor
+
+# Convert a character vector into a factor
+char_vector <- c("red", "green", "blue", "green", "red")  # Create a character vector
+factor_vector <- as.factor(char_vector)  # Convert the character vector to a factor
+factor_vector  # Display the factor
+
+levels(factor_vector) <- c("blue", "G", "RED")  # Rename the levels of the factor
+factor_vector  # Display the updated factor
+
+# Convert gender to factor and rename levels for better readability
+df_temp$GenderFactor <- as.factor(df_temp$Gender)  # Convert the Gender column to a factor
+
+levels(df_temp$GenderFactor) <- c("Female", "Male")  # Rename the levels of the Gender factor
+head(df_temp, 15)  # Display the first 15 rows of the dataset
+
+df_temp <- read.table(file = './Datasets/BodyTemperature.txt', 
+                      header = TRUE, 
+                      stringsAsFactors = TRUE)  # Read the BodyTemperature dataset with strings as factors
+
+# Summary statistics for Age
+mean(df_temp$Age)  # Calculate the mean of the Age column
+
+sd(df_temp$Age)  # Calculate the standard deviation of the Age column
+
+quantile(df_temp$Age, probs = seq(0, 1, 0.1))  # Calculate the deciles of the Age column
+
+range(df_temp$Age)  # Get the range (min and max) of the Age column
+
+quantile(df_temp$Age)  # Calculate the quartiles of the Age column
+IQR(df_temp$Age)  # Calculate the inter-quartile range of the Age column
+
+mean(df_temp[, c(2, 4)])  # Calculate the mean of the 2nd and 4th columns
+
+# Apply functions to multiple columns
+apply(df_temp[, c(2, 4)], 2, median)  # Compute the median for each of the 2nd and 4th columns
+apply(df_temp[, c(2, 4)], 1, mean)  # Compute the mean for each row in the 2nd and 4th columns
+
+apply(df_temp[, c(2:4)], 2, median)  # Compute the median for each of the 2nd to 4th columns
+
+# Load dataset with missing data
+df <- MASS::Pima.tr2  # Load the Pima.tr2 dataset from the MASS package
+summary(df)  # Display summary statistics of the Pima.tr2 dataset
+
+# Check for missing values
+# is.na(df)  # Check for NA values in the dataset (commented out)
+any(is.na(df))  # Check if there are any NA values in the dataset
+which(is.na(df$skin))  # Find the positions of NA values in the 'skin' column
+
+sum(is.na(df))  # Count the total number of NA values in the dataset
