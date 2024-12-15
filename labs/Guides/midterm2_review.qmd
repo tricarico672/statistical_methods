@@ -1,6 +1,10 @@
 ---
 title: "Guide Second Midterm"
-format: html
+format:
+  html:
+    toc: true
+    toc-depth: 4
+    toc-float: true
 editor: visual
 ---
 
@@ -23,7 +27,7 @@ If you want to compute some summary statistics only for the numeric variables bu
 
 `sapply(df[,sapply(df, is.numeric)], FUN = sd)`
 
-This code uses the inner `sapply` to find only the numeric columns in the dataset and subset the original dataset keeping only those, and then it uses the outer `sapply` to compute whatever function `FUN` is specified (in the example it is standard deviation.
+This code uses the inner `sapply` to find only the numeric columns in the dataset and subset the original dataset keeping only those, and then it uses the outer `sapply` to compute whatever function `FUN` is specified (in the example it is standard deviation.)
 :::
 
 ### Computing summary statistics by groups
@@ -57,6 +61,12 @@ library(emdbook)
 FirDBHFec_sum <- FirDBHFec_sum[complete.cases(FirDBHFec_sum),]
 ```
 
+Alternatively, using `na.omit` produces the same result.
+
+```{r}
+FirDBHFec_sum2 <- na.omit(FirDBHFec_sum)
+```
+
 #### Part 2
 
 Plot a histogram of the variable DBH (1)
@@ -69,7 +79,7 @@ hist(FirDBHFec_sum$DBH)
 
 Assuming that DBH are independent observations from a Gamma distribution, estimate the two parameters α and σ with the maximum likelihood method, using the package `bbmle`.
 
-Feel free to use the command dgamma to compute it.
+Feel free to use the command `dgamma` to compute it.
 
 ```{r, warning=FALSE}
 library(bbmle)
@@ -84,11 +94,11 @@ bbmle::mle2(neg_log_likel, start = list(alpha = 10, sigma = .9))
 
 Now in this case we see that the estimated parameters for alpha and sigma are 10.3 and 0.8 respectively. Additionally, notice a few things:
 
-1.  data are passed directly as the x argument into `dgamma` and R automatically performs vectorized operations on each value of the DBH column. Basically, it produces a log probability for each value of DBH. For this reason then `mle2` is capable of solving the optimization problem
-2.  the negative log likelihood is simply computed as the sum of all the log probabilities and then it is made negative by specifying the - in front of the sum
-3.  inside mle2 the start parameters should be a guess and tell the function where it should start looking for the minimum of the negative log likelihood
+1.  data are passed directly as the x argument into `dgamma` and R automatically performs vectorized operations on each value of the `DBH` column. Basically, it produces a log probability for each value of `DBH`. For this reason then `mle2` is capable of solving the optimization problem.
+2.  the negative log likelihood is simply computed as the sum of all the log probabilities and then it is made negative by specifying the - in front of the sum.
+3.  inside `mle2` the start parameters should be a guess and tell the function where it should start looking for the minimum of the negative log likelihood.
 
-In previous lectures we also solved exercises that were slightly different (see Geissler binomial example). One such examples is reported below and it often concerns exercises with discrete distributions and their associated frequencies:
+In previous lectures we also solved exercises that were slightly different (like *Geissler binomial example*). One such examples is reported below and it often concerns exercises with discrete distributions and their associated frequencies.
 
 ##### EX 5 ES11
 
@@ -125,7 +135,7 @@ df$n_bites <- as.numeric(df$n_bites)
 df$rel_freq <- df$freq/sum(df$freq)
 ```
 
-the first five rows of the dataset (df) are presented below:
+the first five rows of the dataset (`df`) are presented below:
 
 ```{r}
 head(df)
@@ -169,7 +179,7 @@ We pretty much always use the `lines()` function to do this kind of work. Just n
 
 ## Fitting linear models
 
-We can fit linear models simply by using the `lm` function in R and specifying the variables of interests separating the dependent variable and the predictors by a \~.
+We can fit linear models simply by using the `lm` function in R and specifying the variables of interests separating the dependent variable and the predictors by a `~`.
 
 ```{r}
 library(MASS)
@@ -234,7 +244,9 @@ plot(df$Price)
 lines(df_pred$predictions, col = "red")
 ```
 
-Notice that in the example above the columns in the new dataframe must be named exactly as the original columns that were used to fit the model, otherwise you'll get an `objectNotFound` error out of it.
+::: callout-warning
+Notice that in the example above the columns in the new `data.frame` must be named exactly as the original columns that were used to fit the model, otherwise you'll get an `objectNotFound` error out of it.
+:::
 
 Even if it does not make much sense in this case we can try and fit a polynomial regression model by using the `poly` function.
 
@@ -285,14 +297,14 @@ mylm3 <- lm(speed ~ poly(dist,2), df)
 summary(mylm3)
 ```
 
-From the `summary` we see that the degree two term is significant so we want to keep this model. How do we plot the results of this model?
+From the `summary` we see that the degree-two term is significant so we want to keep this model. How do we plot the results of this model?
 
 ```{r}
 df_pred <- data.frame("dist" = seq(0,120))
 df_pred$y_hat <- predict(mylm3, df_pred)
 ```
 
-First we create a dataset which stores the prediction that are made using the model. Then we overlay on the original plot the predictions obtained from the model.
+First we create a `data.frame` which stores the prediction that are made using the model. Then we overlay on the original plot the predictions obtained from the model.
 
 ```{r}
 plot(speed~dist, df)
@@ -300,6 +312,92 @@ lines(df_pred$y_hat, col = "red", lwd = 3)
 ```
 
 And this is how we compare (visually) the original data to the predictions we get from the polynomial model.
+
+### Plotting regression with categorical variables
+
+```{r}
+df_iris <- iris
+
+head(df_iris)
+```
+
+Let's say we want to see if there is a significant difference in the length of the sepal between species. To do this we would specify the following linear model.
+
+```{r}
+iris_lm <- lm(Sepal.Length ~ Species + Petal.Length, data = df_iris)
+summary(iris_lm)
+```
+
+From the summary we learn that there is a significant difference between species, specifically there is a difference in sepal length between versicolor and setosa and between virginica and setosa. Notice that setosa acts as the baseline level here and the only comparisons we can make are between that species and another single species.
+
+Now, since there is no interaction effect, this would just result in a plot of three different lines with different intercept but with the same slope, to show this visually we need to do some work first.
+
+```{r}
+virg <- subset(df_iris, Species == "virginica")
+setosa <- subset(df_iris, Species == "setosa")
+versicolor <- subset(df_iris, Species == "versicolor")
+
+virg$pred <- predict(iris_lm, virg)
+setosa$pred <- predict(iris_lm, setosa)
+versicolor$pred <- predict(iris_lm, versicolor)
+```
+
+Now that we have predictions for each one we can show them on the plot.
+
+```{r}
+plot(Sepal.Length ~ Petal.Length, data = df_iris, col = Species)
+lines(virg$Petal.Length, virg$pred, col = "green")
+lines(setosa$Petal.Length, setosa$pred, col = "black")
+lines(versicolor$Petal.Length, versicolor$pred, col = "red")
+```
+
+As we expected we have three different lines, one for each group, each having the same slope.
+
+### Plotting regression line (model with interactions)
+
+We can also specify models with interaction (multiplicative) terms. This will produce lines that have changing slopes whenever the factor to which they are linked changes.
+
+```{r}
+iris_lm_int <- lm(Sepal.Length ~ Species*Petal.Length, data = df_iris)
+summary(iris_lm_int)
+```
+
+In this model it does not make much sense to include an interaction and we see that the two interaction terms are statistically non-significant. Still we can plot out the lines to see how they turn out and how they differ from the previous example.
+
+```{r}
+virg$pred <- predict(iris_lm_int, virg)
+setosa$pred <- predict(iris_lm_int, setosa)
+versicolor$pred <- predict(iris_lm_int, versicolor)
+```
+
+```{r}
+plot(Sepal.Length ~ Petal.Length, data = df_iris, col = Species)
+lines(virg$Petal.Length, virg$pred, col = "green")
+lines(setosa$Petal.Length, setosa$pred, col = "black")
+lines(versicolor$Petal.Length, versicolor$pred, col = "red")
+```
+
+From here we see that the lines are almost parallel to each other even though we allowed the slope to change by adding the interaction terms. This is a good indicator (along with the high $p$ value) that the model does not benefit from the addition of interaction terms.
+
+::: callout-important
+## Parallel Regression Slopes
+
+Notice that the lines that are almost perfectly parallel represent the *versicolor* and *virginica* groups. This can be deduced from their estimated slope. First of all, the slope for each different group is not statistically different from the baseline given by the *setosa* group. However, from the summary above we can see that the estimated slope for the *versicolor* group is .5423 (baseline) + .2860 (estimated difference in slopes) = .8283 while the estimated slope for the *virginica* group is .5432 + .4534 = .9957.
+
+Lines are almost parallel when their slopes are very close to each other, so from that we deduce that the *versicolor* and *virginica* groups have regression lines that are almost **parallel**.
+:::
+
+```{r}
+par(mfrow = c(1,2))
+
+plot(Sepal.Length ~ Petal.Length, data = df_iris, col = Species,
+     xlim = c(3,5))
+lines(versicolor$Petal.Length, versicolor$pred, col = "red")
+
+plot(Sepal.Length ~ Petal.Length, data = df_iris, col = Species,
+     xlim = c(5,7))
+lines(virg$Petal.Length, virg$pred, col = "green")
+```
 
 ### Comparing models
 
@@ -334,5 +432,5 @@ anova(my_lm, my_lm2)
 For instance, here we see that the $p$ is not small enough to reject $H_0$ and so we cannot say that the more complex model is better!
 
 ::: callout-tip
-You can understand which model is the simpler one in the table simply by looking at the residuals degrees of freedom. Knowing that those are always equal to $n-p-1$, where $p$ is the number of predictors, helps in understanding that the lower residuals' degrees of freedom will be always associated to the more complex model (i.e. the model with the higher $p$)
+You can understand which model is the simpler one in the table simply by looking at the residuals degrees of freedom. Knowing that those are always equal to $n-p-1$, where $p$ is the number of predictors, helps in understanding that the lower residuals' degrees of freedom will be always associated to the more complex model (i.e. the model with the higher number of $p$)
 :::
