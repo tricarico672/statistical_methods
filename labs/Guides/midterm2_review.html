@@ -128,6 +128,46 @@ window.Quarto = {
 <section id="solving-r-exercises" class="level1">
 <h1>Solving R Exercises</h1>
 <p>The second midterm is based largely on being able to compute (log)likelihoods for different distributions, estimating the MLE parameters of such distributions and be able to fit regression models as well as producing relevant visualizations of estimated distributions and assessing visually the assumptions of linear models.</p>
+<section id="computing-summary-statistics-and-general-data-visualization" class="level2">
+<h2 class="anchored" data-anchor-id="computing-summary-statistics-and-general-data-visualization">Computing summary statistics and general data visualization</h2>
+<p>To carry out the most common tasks in data visualization we just need to remember about a few functions and how they work.</p>
+<ol type="1">
+<li><code>plot</code> produces the plot of one or two variables. The structure can be specified either by passing two vectors as its <code>x</code> and <code>y</code> arguments or by specifying a formula of the form <code>y~x</code> along with a <code>data</code> argument containing the name of the dataframe containing columns <code>y</code> and <code>x</code>.</li>
+<li><code>boxplot</code> produces the boxplot of a variable with the option of splitting it across grouping variable if a formula of the form <code>y~x</code> is passed where <code>y</code> is numeric and <code>x</code> is categorical.</li>
+<li><code>hist</code> produces the histogram of a variable passed in as a vector. Set <code>freq</code> equal to <code>FALSE</code> to get a density plot on the y axis rather than a frequency plot. This is useful when we want to overlay other distributions on top of it.</li>
+</ol>
+<p>Then for what concerns summary statistics you can get a five-number summary of each numeric variable in the dataset along with their means by using <code>summary</code> , and then you can compute the standard deviation by using <code>sapply(df[,cols], FUN = sd)</code> where <code>cols</code> specifies the subset of numeric columns in the dataset. You can get these columns either by using a range of numeric values (i.e.&nbsp;<code>1:4</code>) or by specifying specific non-adjacent columns (e.g., <code>c(1,3)</code> gets only the first and third column in the dataset)</p>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Tip
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>If you want to compute some summary statistics only for the numeric variables but you want R to find those automatically for you can use the following syntax:</p>
+<p><code>sapply(df[,sapply(df, is.numeric)], FUN = sd)</code></p>
+<p>This code uses the inner <code>sapply</code> to find only the numeric columns in the dataset and subset the original dataset keeping only those, and then it uses the outer <code>sapply</code> to compute whatever function <code>FUN</code> is specified (in the example it is standard deviation.</p>
+</div>
+</div>
+<section id="computing-summary-statistics-by-groups" class="level3">
+<h3 class="anchored" data-anchor-id="computing-summary-statistics-by-groups">Computing summary statistics by groups</h3>
+<p>This can be done easily using aggregate. Below is an example using the <code>iris</code> dataset.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(datasets)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">aggregate</span>(Petal.Length <span class="sc">~</span> Species, <span class="at">data =</span> iris, <span class="at">FUN =</span> mean)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>     Species Petal.Length
+1     setosa        1.462
+2 versicolor        4.260
+3  virginica        5.552</code></pre>
+</div>
+</div>
+<p>You just need to specify the numeric variable and the grouping variable, specify the dataset where they are stored, and then specify the statistic you want to compute for these subsets of the data.</p>
+</section>
+</section>
 <section id="computing-likelihoods" class="level2">
 <h2 class="anchored" data-anchor-id="computing-likelihoods">Computing likelihoods</h2>
 <p>When computing likelihoods you might be facing different scenarios. You might be asked to use already existing functions in R and embed them in a function we create. Alternatively, we might need to do some more work and start from the basics of how one would define mathematically a likelihood function and work up from there (binomial example with frequencies)</p>
@@ -139,20 +179,20 @@ window.Quarto = {
 <p>Read the dataset FirDBHFec_sum contained in the package emdbook.</p>
 <p>1. Notice that for several observations of the dataset, the variable DBH has missing values; hence, clean the dataset of those observations.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(emdbook)</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>FirDBHFec_sum <span class="ot">&lt;-</span> FirDBHFec_sum[<span class="fu">complete.cases</span>(FirDBHFec_sum),]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(emdbook)</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>FirDBHFec_sum <span class="ot">&lt;-</span> FirDBHFec_sum[<span class="fu">complete.cases</span>(FirDBHFec_sum),]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 <section id="part-2" class="level4">
 <h4 class="anchored" data-anchor-id="part-2">Part 2</h4>
 <p>Plot a histogram of the variable DBH (1)</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">hist</span>(FirDBHFec_sum<span class="sc">$</span>DBH)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">hist</span>(FirDBHFec_sum<span class="sc">$</span>DBH)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="midterm2_review_files/figure-html/unnamed-chunk-2-1.png" class="img-fluid figure-img" width="672"></p>
+<p><img src="midterm2_review_files/figure-html/unnamed-chunk-3-1.png" class="img-fluid figure-img" width="672"></p>
 </figure>
 </div>
 </div>
@@ -163,16 +203,16 @@ window.Quarto = {
 <p>Assuming that DBH are independent observations from a Gamma distribution, estimate the two parameters α and σ with the maximum likelihood method, using the package <code>bbmle</code>.</p>
 <p>Feel free to use the command dgamma to compute it.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(bbmle)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(bbmle)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
 <pre><code>Loading required package: stats4</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>neg_log_likel <span class="ot">&lt;-</span> <span class="cf">function</span>(alpha, sigma){</span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  res <span class="ot">&lt;-</span> <span class="sc">-</span><span class="fu">sum</span>(<span class="fu">dgamma</span>(FirDBHFec_sum<span class="sc">$</span>DBH, <span class="at">shape =</span> alpha, <span class="at">scale =</span> sigma, <span class="at">log =</span> <span class="cn">TRUE</span>))</span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(res)</span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>bbmle<span class="sc">::</span><span class="fu">mle2</span>(neg_log_likel, <span class="at">start =</span> <span class="fu">list</span>(<span class="at">alpha =</span> <span class="dv">10</span>, <span class="at">sigma =</span> .<span class="dv">9</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>neg_log_likel <span class="ot">&lt;-</span> <span class="cf">function</span>(alpha, sigma){</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>  res <span class="ot">&lt;-</span> <span class="sc">-</span><span class="fu">sum</span>(<span class="fu">dgamma</span>(FirDBHFec_sum<span class="sc">$</span>DBH, <span class="at">shape =</span> alpha, <span class="at">scale =</span> sigma, <span class="at">log =</span> <span class="cn">TRUE</span>))</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(res)</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>bbmle<span class="sc">::</span><span class="fu">mle2</span>(neg_log_likel, <span class="at">start =</span> <span class="fu">list</span>(<span class="at">alpha =</span> <span class="dv">10</span>, <span class="at">sigma =</span> .<span class="dv">9</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>
 Call:
@@ -198,7 +238,7 @@ Log-likelihood: -725.42 </code></pre>
 <p>We believe that the number of bites received by a subject follows a Poisson distribution of unknown parameter λ. Using the data.frame obtained in the previous point, write down the log-likelihood function of the parameter λ and find the maximum likelihood estimate of λ, and its 95%−confidence interval.</p>
 <p>the first five rows of the dataset (df) are presented below:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(df)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(df)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>  n_bites freq    rel_freq
 1       1    1 0.006666667
@@ -211,14 +251,14 @@ Log-likelihood: -725.42 </code></pre>
 </div>
 <p>And the associated negative log-likelihood function associated to the solution is the one reported below</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>log_likel_freq <span class="ot">&lt;-</span> <span class="cf">function</span>(lambda){</span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>  bites <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>(df<span class="sc">$</span>n_bites)</span>
-<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>  subjects <span class="ot">&lt;-</span> df<span class="sc">$</span>freq</span>
-<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>  <span class="sc">-</span><span class="fu">sum</span>(<span class="fu">dpois</span>(bites, lambda, <span class="at">log =</span> <span class="cn">TRUE</span>) <span class="sc">*</span> subjects)</span>
-<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>(ml_lambda <span class="ot">&lt;-</span> <span class="fu">mle2</span>(log_likel_freq, <span class="at">start =</span> <span class="fu">list</span>(<span class="at">lambda =</span> <span class="dv">1</span>)))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>log_likel_freq <span class="ot">&lt;-</span> <span class="cf">function</span>(lambda){</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>  bites <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>(df<span class="sc">$</span>n_bites)</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>  subjects <span class="ot">&lt;-</span> df<span class="sc">$</span>freq</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>  <span class="sc">-</span><span class="fu">sum</span>(<span class="fu">dpois</span>(bites, lambda, <span class="at">log =</span> <span class="cn">TRUE</span>) <span class="sc">*</span> subjects)</span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>(ml_lambda <span class="ot">&lt;-</span> <span class="fu">mle2</span>(log_likel_freq, <span class="at">start =</span> <span class="fu">list</span>(<span class="at">lambda =</span> <span class="dv">1</span>)))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>
 Call:
@@ -231,9 +271,9 @@ Coefficients:
 Log-likelihood: -426.52 </code></pre>
 </div>
 </div>
-<p>From the example above we learn that when working with frequencies we want to multiply by the number of times a specific probability needs to be computed (i.e.&nbsp;multiply by the frequency each number of bites appears in the sample)</p>
+<p>From the example above we learn that when working with frequencies we want to multiply by the number of times a specific probability needs to be computed (e.g., multiply by the frequency each number of bites appears in the sample)</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">confint</span>(ml_lambda, <span class="at">level =</span> .<span class="dv">95</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="fu">confint</span>(ml_lambda, <span class="at">level =</span> .<span class="dv">95</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>   2.5 %   97.5 % 
 7.011991 7.885094 </code></pre>
@@ -250,14 +290,14 @@ Log-likelihood: -426.52 </code></pre>
 <p>Make an appropriate plot showing the data, and the estimated probabilities.</p>
 <p>Do you think that the proposed Poisson model is correct?</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="fu">seq</span>(<span class="fu">min</span>(df<span class="sc">$</span>n_bites), <span class="fu">max</span>(df<span class="sc">$</span>n_bites))</span>
-<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>y <span class="ot">&lt;-</span> <span class="fu">dpois</span>(x, <span class="at">lambda =</span> ml_lambda<span class="sc">@</span>coef)</span>
-<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a><span class="fu">hist</span>(<span class="fu">as.numeric</span>(df<span class="sc">$</span>n_bites), <span class="at">freq =</span> F, <span class="at">breaks =</span> <span class="dv">5</span>, <span class="at">ylim =</span> <span class="fu">c</span>(<span class="dv">0</span>,.<span class="dv">2</span>))</span>
-<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a><span class="fu">lines</span>(x,y)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="fu">seq</span>(<span class="fu">min</span>(df<span class="sc">$</span>n_bites), <span class="fu">max</span>(df<span class="sc">$</span>n_bites))</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>y <span class="ot">&lt;-</span> <span class="fu">dpois</span>(x, <span class="at">lambda =</span> ml_lambda<span class="sc">@</span>coef)</span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a><span class="fu">hist</span>(<span class="fu">as.numeric</span>(df<span class="sc">$</span>n_bites), <span class="at">freq =</span> F, <span class="at">breaks =</span> <span class="dv">5</span>, <span class="at">ylim =</span> <span class="fu">c</span>(<span class="dv">0</span>,.<span class="dv">2</span>))</span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a><span class="fu">lines</span>(x,y)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="midterm2_review_files/figure-html/unnamed-chunk-8-1.png" class="img-fluid figure-img" width="672"></p>
+<p><img src="midterm2_review_files/figure-html/unnamed-chunk-9-1.png" class="img-fluid figure-img" width="672"></p>
 </figure>
 </div>
 </div>
@@ -269,10 +309,10 @@ Log-likelihood: -426.52 </code></pre>
 <h2 class="anchored" data-anchor-id="fitting-linear-models">Fitting linear models</h2>
 <p>We can fit linear models simply by using the <code>lm</code> function in R and specifying the variables of interests separating the dependent variable and the predictors by a ~.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(MASS)</span>
-<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>df <span class="ot">&lt;-</span> MASS<span class="sc">::</span>Cars93[<span class="fu">complete.cases</span>(MASS<span class="sc">::</span>Cars93),]</span>
-<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(df)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(MASS)</span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>df <span class="ot">&lt;-</span> MASS<span class="sc">::</span>Cars93[<span class="fu">complete.cases</span>(MASS<span class="sc">::</span>Cars93),]</span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(df)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>  Manufacturer   Model    Type Min.Price Price Max.Price MPG.city MPG.highway
 1        Acura Integra   Small      12.9  15.9      18.8       25          31
@@ -305,8 +345,8 @@ Log-likelihood: -426.52 </code></pre>
 </div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>my_lm <span class="ot">&lt;-</span> <span class="fu">lm</span>(Price <span class="sc">~</span> Horsepower, <span class="at">data =</span> df)</span>
-<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(my_lm)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>my_lm <span class="ot">&lt;-</span> <span class="fu">lm</span>(Price <span class="sc">~</span> Horsepower, <span class="at">data =</span> df)</span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(my_lm)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>
 Call:
@@ -332,12 +372,12 @@ F-statistic: 130.4 on 1 and 80 DF,  p-value: &lt; 2.2e-16</code></pre>
 <section id="diagnosis-of-residuals" class="level3">
 <h3 class="anchored" data-anchor-id="diagnosis-of-residuals">Diagnosis of residuals</h3>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="fu">par</span>(<span class="at">mfrow =</span> <span class="fu">c</span>(<span class="dv">2</span>,<span class="dv">2</span>))</span>
-<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(my_lm)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="fu">par</span>(<span class="at">mfrow =</span> <span class="fu">c</span>(<span class="dv">2</span>,<span class="dv">2</span>))</span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(my_lm)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="midterm2_review_files/figure-html/unnamed-chunk-11-1.png" class="img-fluid figure-img" width="672"></p>
+<p><img src="midterm2_review_files/figure-html/unnamed-chunk-12-1.png" class="img-fluid figure-img" width="672"></p>
 </figure>
 </div>
 </div>
@@ -367,24 +407,24 @@ Caution
 </div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(Price <span class="sc">~</span> Horsepower, <span class="at">data =</span> df)</span>
-<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a><span class="fu">abline</span>(my_lm, <span class="at">col =</span> <span class="st">"red"</span>, <span class="at">lwd =</span> <span class="dv">3</span>)</span>
-<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a><span class="fu">text</span>(<span class="dv">250</span>,<span class="dv">25</span>,<span class="st">"Estimated Regression line"</span>, <span class="at">col =</span> <span class="st">"red"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(Price <span class="sc">~</span> Horsepower, <span class="at">data =</span> df)</span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a><span class="fu">abline</span>(my_lm, <span class="at">col =</span> <span class="st">"red"</span>, <span class="at">lwd =</span> <span class="dv">3</span>)</span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a><span class="fu">text</span>(<span class="dv">250</span>,<span class="dv">25</span>,<span class="st">"Estimated Regression line"</span>, <span class="at">col =</span> <span class="st">"red"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="midterm2_review_files/figure-html/unnamed-chunk-12-1.png" class="img-fluid figure-img" width="672"></p>
+<p><img src="midterm2_review_files/figure-html/unnamed-chunk-13-1.png" class="img-fluid figure-img" width="672"></p>
 </figure>
 </div>
 </div>
 </div>
 </section>
-<section id="multiple-regression" class="level3">
-<h3 class="anchored" data-anchor-id="multiple-regression">Multiple regression</h3>
+<section id="multiple-regression-dont-do-this" class="level3">
+<h3 class="anchored" data-anchor-id="multiple-regression-dont-do-this">Multiple regression (don’t do this)</h3>
 <p>Let’s see the case of a multiple regression now:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>my_lm2 <span class="ot">&lt;-</span> <span class="fu">lm</span>(Price<span class="sc">~</span>Horsepower <span class="sc">+</span> Length, <span class="at">data =</span> df)</span>
-<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(my_lm2)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>my_lm2 <span class="ot">&lt;-</span> <span class="fu">lm</span>(Price<span class="sc">~</span>Horsepower <span class="sc">+</span> Length, <span class="at">data =</span> df)</span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(my_lm2)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>
 Call:
@@ -409,17 +449,17 @@ F-statistic: 65.37 on 2 and 79 DF,  p-value: &lt; 2.2e-16</code></pre>
 </div>
 <p>To produce a plot of this we first need to get predictions out of the model and those will be plotted along the original values. This is done by following these steps:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>df_pred <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="st">"Horsepower"</span> <span class="ot">=</span> <span class="fu">seq</span>(<span class="fu">min</span>(df<span class="sc">$</span>Horsepower), <span class="fu">max</span>(df<span class="sc">$</span>Horsepower), <span class="at">length.out=</span><span class="dv">100</span>),</span>
-<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>                      <span class="st">"Length"</span> <span class="ot">=</span> <span class="fu">seq</span>(<span class="fu">min</span>(df<span class="sc">$</span>Length), <span class="fu">max</span>(df<span class="sc">$</span>Length), <span class="at">length.out =</span> <span class="dv">100</span>))</span>
-<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>df_pred<span class="sc">$</span>predictions <span class="ot">&lt;-</span> <span class="fu">predict</span>(my_lm2, df_pred)</span>
-<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(df<span class="sc">$</span>Price)</span>
-<span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a><span class="fu">lines</span>(df_pred<span class="sc">$</span>predictions, <span class="at">col =</span> <span class="st">"red"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>df_pred <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="st">"Horsepower"</span> <span class="ot">=</span> <span class="fu">seq</span>(<span class="fu">min</span>(df<span class="sc">$</span>Horsepower), <span class="fu">max</span>(df<span class="sc">$</span>Horsepower), <span class="at">length.out=</span><span class="dv">100</span>),</span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>                      <span class="st">"Length"</span> <span class="ot">=</span> <span class="fu">seq</span>(<span class="fu">min</span>(df<span class="sc">$</span>Length), <span class="fu">max</span>(df<span class="sc">$</span>Length), <span class="at">length.out =</span> <span class="dv">100</span>))</span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a>df_pred<span class="sc">$</span>predictions <span class="ot">&lt;-</span> <span class="fu">predict</span>(my_lm2, df_pred)</span>
+<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(df<span class="sc">$</span>Price)</span>
+<span id="cb24-7"><a href="#cb24-7" aria-hidden="true" tabindex="-1"></a><span class="fu">lines</span>(df_pred<span class="sc">$</span>predictions, <span class="at">col =</span> <span class="st">"red"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="midterm2_review_files/figure-html/unnamed-chunk-14-1.png" class="img-fluid figure-img" width="672"></p>
+<p><img src="midterm2_review_files/figure-html/unnamed-chunk-15-1.png" class="img-fluid figure-img" width="672"></p>
 </figure>
 </div>
 </div>
@@ -427,8 +467,8 @@ F-statistic: 65.37 on 2 and 79 DF,  p-value: &lt; 2.2e-16</code></pre>
 <p>Notice that in the example above the columns in the new dataframe must be named exactly as the original columns that were used to fit the model, otherwise you’ll get an <code>objectNotFound</code> error out of it.</p>
 <p>Even if it does not make much sense in this case we can try and fit a polynomial regression model by using the <code>poly</code> function.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>my_lm3 <span class="ot">&lt;-</span> <span class="fu">lm</span>(Price<span class="sc">~</span><span class="fu">poly</span>(Horsepower,<span class="dv">2</span>) <span class="sc">+</span> Length, <span class="at">data =</span> df)</span>
-<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(my_lm3)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>my_lm3 <span class="ot">&lt;-</span> <span class="fu">lm</span>(Price<span class="sc">~</span><span class="fu">poly</span>(Horsepower,<span class="dv">2</span>) <span class="sc">+</span> Length, <span class="at">data =</span> df)</span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(my_lm3)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>
 Call:
@@ -454,7 +494,7 @@ F-statistic:  43.6 on 3 and 78 DF,  p-value: &lt; 2.2e-16</code></pre>
 </div>
 <p>This model will use a degree two polynomial of Horsepower along with its degree one form. We can plot this out using the model same lines of code above.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="fu">anova</span>(my_lm)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="fu">anova</span>(my_lm)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Analysis of Variance Table
 
@@ -468,11 +508,97 @@ Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</code></pre>
 </div>
 <p>Here with <code>anova</code> we are testing simply the <span class="math inline">\(H_0\)</span> that all estimated coefficients are 0 compared to the <span class="math inline">\(H_1\)</span> being <span class="math inline">\(\neg H_0\)</span> (at least one is not zero). A small enough <span class="math inline">\(p\)</span> indicates that we can reject <span class="math inline">\(H_0\)</span>.</p>
 </section>
+<section id="plotting-significant-polynomial-regressions" class="level3">
+<h3 class="anchored" data-anchor-id="plotting-significant-polynomial-regressions">Plotting (significant) polynomial regressions</h3>
+<p>Here is an example where we can see how to overlay the plot of a polynomial regression line on top of the data.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(datasets)</span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>df <span class="ot">&lt;-</span> datasets<span class="sc">::</span>cars</span>
+<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a>mylm <span class="ot">&lt;-</span> <span class="fu">lm</span>(speed<span class="sc">~</span>dist, df)</span>
+<span id="cb29-5"><a href="#cb29-5" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(mylm)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+lm(formula = speed ~ dist, data = df)
+
+Residuals:
+    Min      1Q  Median      3Q     Max 
+-7.5293 -2.1550  0.3615  2.4377  6.4179 
+
+Coefficients:
+            Estimate Std. Error t value Pr(&gt;|t|)    
+(Intercept)  8.28391    0.87438   9.474 1.44e-12 ***
+dist         0.16557    0.01749   9.464 1.49e-12 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Residual standard error: 3.156 on 48 degrees of freedom
+Multiple R-squared:  0.6511,    Adjusted R-squared:  0.6438 
+F-statistic: 89.57 on 1 and 48 DF,  p-value: 1.49e-12</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(speed<span class="sc">~</span>dist, df)</span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a><span class="fu">abline</span>(mylm, <span class="at">col =</span> <span class="st">"red"</span>, <span class="at">lwd =</span> <span class="dv">3</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="midterm2_review_files/figure-html/unnamed-chunk-20-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>We notice that the data would be better approximated by a polynomial regression so we try it out:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a>mylm3 <span class="ot">&lt;-</span> <span class="fu">lm</span>(speed <span class="sc">~</span> <span class="fu">poly</span>(dist,<span class="dv">2</span>), df)</span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(mylm3)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+lm(formula = speed ~ poly(dist, 2), data = df)
+
+Residuals:
+   Min     1Q Median     3Q    Max 
+-7.559 -1.722  0.473  1.932  5.942 
+
+Coefficients:
+               Estimate Std. Error t value Pr(&gt;|t|)    
+(Intercept)     15.4000     0.4111  37.463  &lt; 2e-16 ***
+poly(dist, 2)1  29.8660     2.9067  10.275 1.33e-13 ***
+poly(dist, 2)2  -8.9950     2.9067  -3.095  0.00332 ** 
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Residual standard error: 2.907 on 47 degrees of freedom
+Multiple R-squared:  0.7101,    Adjusted R-squared:  0.6978 
+F-statistic: 57.57 on 2 and 47 DF,  p-value: 2.299e-13</code></pre>
+</div>
+</div>
+<p>From the <code>summary</code> we see that the degree two term is significant so we want to keep this model. How do we plot the results of this model?</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a>df_pred <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="st">"dist"</span> <span class="ot">=</span> <span class="fu">seq</span>(<span class="dv">0</span>,<span class="dv">120</span>))</span>
+<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a>df_pred<span class="sc">$</span>y_hat <span class="ot">&lt;-</span> <span class="fu">predict</span>(mylm3, df_pred)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>First we create a dataset which stores the prediction that are made using the model. Then we overlay on the original plot the predictions obtained from the model.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(speed<span class="sc">~</span>dist, df)</span>
+<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a><span class="fu">lines</span>(df_pred<span class="sc">$</span>y_hat, <span class="at">col =</span> <span class="st">"red"</span>, <span class="at">lwd =</span> <span class="dv">3</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="midterm2_review_files/figure-html/unnamed-chunk-23-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>And this is how we compare (visually) the original data to the predictions we get from the polynomial model.</p>
+</section>
 <section id="comparing-models" class="level3">
 <h3 class="anchored" data-anchor-id="comparing-models">Comparing models</h3>
 <p>We can also compare models by comparing their Adj. <span class="math inline">\(R^2\)</span> (higher better), AIC (smaller better), BIC (smaller better) statistics.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="fu">AIC</span>(my_lm, my_lm2)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a><span class="fu">AIC</span>(my_lm, my_lm2)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>       df      AIC
 my_lm   3 535.3641
@@ -480,7 +606,7 @@ my_lm2  4 536.5918</code></pre>
 </div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="fu">BIC</span>(my_lm, my_lm2)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb38"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a><span class="fu">BIC</span>(my_lm, my_lm2)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>       df      BIC
 my_lm   3 542.5843
@@ -488,7 +614,7 @@ my_lm2  4 546.2187</code></pre>
 </div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(my_lm)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb40"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(my_lm)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>
 Call:
@@ -511,7 +637,7 @@ F-statistic: 130.4 on 1 and 80 DF,  p-value: &lt; 2.2e-16</code></pre>
 </div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(my_lm2)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb42"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(my_lm2)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>
 Call:
@@ -540,7 +666,7 @@ F-statistic: 65.37 on 2 and 79 DF,  p-value: &lt; 2.2e-16</code></pre>
 <li><p><span class="math inline">\(H_1\)</span>: more complex model is better</p></li>
 </ul>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="fu">anova</span>(my_lm, my_lm2)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb44"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a><span class="fu">anova</span>(my_lm, my_lm2)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Analysis of Variance Table
 

@@ -8,6 +8,35 @@ editor: visual
 
 The second midterm is based largely on being able to compute (log)likelihoods for different distributions, estimating the MLE parameters of such distributions and be able to fit regression models as well as producing relevant visualizations of estimated distributions and assessing visually the assumptions of linear models.
 
+## Computing summary statistics and general data visualization
+
+To carry out the most common tasks in data visualization we just need to remember about a few functions and how they work.
+
+1.  `plot` produces the plot of one or two variables. The structure can be specified either by passing two vectors as its `x` and `y` arguments or by specifying a formula of the form `y~x` along with a `data` argument containing the name of the dataframe containing columns `y` and `x`.
+2.  `boxplot` produces the boxplot of a variable with the option of splitting it across grouping variable if a formula of the form `y~x` is passed where `y` is numeric and `x` is categorical.
+3.  `hist` produces the histogram of a variable passed in as a vector. Set `freq` equal to `FALSE` to get a density plot on the y axis rather than a frequency plot. This is useful when we want to overlay other distributions on top of it.
+
+Then for what concerns summary statistics you can get a five-number summary of each numeric variable in the dataset along with their means by using `summary` , and then you can compute the standard deviation by using `sapply(df[,cols], FUN = sd)` where `cols` specifies the subset of numeric columns in the dataset. You can get these columns either by using a range of numeric values (i.e. `1:4`) or by specifying specific non-adjacent columns (e.g., `c(1,3)` gets only the first and third column in the dataset)
+
+::: callout-tip
+If you want to compute some summary statistics only for the numeric variables but you want R to find those automatically for you can use the following syntax:
+
+`sapply(df[,sapply(df, is.numeric)], FUN = sd)`
+
+This code uses the inner `sapply` to find only the numeric columns in the dataset and subset the original dataset keeping only those, and then it uses the outer `sapply` to compute whatever function `FUN` is specified (in the example it is standard deviation.
+:::
+
+### Computing summary statistics by groups
+
+This can be done easily using aggregate. Below is an example using the `iris` dataset.
+
+```{r}
+library(datasets)
+aggregate(Petal.Length ~ Species, data = iris, FUN = mean)
+```
+
+You just need to specify the numeric variable and the grouping variable, specify the dataset where they are stored, and then specify the statistic you want to compute for these subsets of the data.
+
 ## Computing likelihoods
 
 When computing likelihoods you might be facing different scenarios. You might be asked to use already existing functions in R and embed them in a function we create. Alternatively, we might need to do some more work and start from the basics of how one would define mathematically a likelihood function and work up from there (binomial example with frequencies)
@@ -184,7 +213,7 @@ abline(my_lm, col = "red", lwd = 3)
 text(250,25,"Estimated Regression line", col = "red")
 ```
 
-### Multiple regression
+### Multiple regression (don't do this)
 
 Let's see the case of a multiple regression now:
 
@@ -231,6 +260,46 @@ anova(my_lm)
 ```
 
 Here with `anova` we are testing simply the $H_0$ that all estimated coefficients are 0 compared to the $H_1$ being $\neg H_0$ (at least one is not zero). A small enough $p$ indicates that we can reject $H_0$.
+
+### Plotting (significant) polynomial regressions
+
+Here is an example where we can see how to overlay the plot of a polynomial regression line on top of the data.
+
+```{r}
+library(datasets)
+df <- datasets::cars
+
+mylm <- lm(speed~dist, df)
+summary(mylm)
+```
+
+```{r}
+plot(speed~dist, df)
+abline(mylm, col = "red", lwd = 3)
+```
+
+We notice that the data would be better approximated by a polynomial regression so we try it out:
+
+```{r}
+mylm3 <- lm(speed ~ poly(dist,2), df)
+summary(mylm3)
+```
+
+From the `summary` we see that the degree two term is significant so we want to keep this model. How do we plot the results of this model?
+
+```{r}
+df_pred <- data.frame("dist" = seq(0,120))
+df_pred$y_hat <- predict(mylm3, df_pred)
+```
+
+First we create a dataset which stores the prediction that are made using the model. Then we overlay on the original plot the predictions obtained from the model.
+
+```{r}
+plot(speed~dist, df)
+lines(df_pred$y_hat, col = "red", lwd = 3)
+```
+
+And this is how we compare (visually) the original data to the predictions we get from the polynomial model.
 
 ### Comparing models
 
