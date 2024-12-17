@@ -136,6 +136,7 @@ window.Quarto = {
   <li><a href="#plotting-regression-with-categorical-variables" id="toc-plotting-regression-with-categorical-variables" class="nav-link" data-scroll-target="#plotting-regression-with-categorical-variables">Plotting regression with categorical variables</a></li>
   <li><a href="#plotting-regression-line-model-with-interactions" id="toc-plotting-regression-line-model-with-interactions" class="nav-link" data-scroll-target="#plotting-regression-line-model-with-interactions">Plotting regression line (model with interactions)</a></li>
   <li><a href="#comparing-models" id="toc-comparing-models" class="nav-link" data-scroll-target="#comparing-models">Comparing models</a></li>
+  <li><a href="#stepwise-regression" id="toc-stepwise-regression" class="nav-link" data-scroll-target="#stepwise-regression">Stepwise regression</a></li>
   </ul></li>
   </ul></li>
   </ul>
@@ -896,6 +897,89 @@ Tip
 </div>
 <div class="callout-body-container callout-body">
 <p>You can understand which model is the simpler one in the table simply by looking at the residuals degrees of freedom. Knowing that those are always equal to <span class="math inline">\(n-p-1\)</span>, where <span class="math inline">\(p\)</span> is the number of predictors, helps in understanding that the lower residuals’ degrees of freedom will be always associated to the more complex model (i.e.&nbsp;the model with the higher number of <span class="math inline">\(p\)</span>)</p>
+</div>
+</div>
+</section>
+<section id="stepwise-regression" class="level3">
+<h3 class="anchored" data-anchor-id="stepwise-regression">Stepwise regression</h3>
+<p>We can also try and add predictors to a linear model until adding a new predictor does not improve the AIC score of the model. This can be done in the following way.</p>
+<p>First we need to specify a model with the entire set of predictors added to it.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb58"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb58-1"><a href="#cb58-1" aria-hidden="true" tabindex="-1"></a>my_lm_all <span class="ot">&lt;-</span> <span class="fu">lm</span>(Petal.Length <span class="sc">~</span> ., <span class="at">data =</span> df_iris)</span>
+<span id="cb58-2"><a href="#cb58-2" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(my_lm_all)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+lm(formula = Petal.Length ~ ., data = df_iris)
+
+Residuals:
+     Min       1Q   Median       3Q      Max 
+-0.78396 -0.15708  0.00193  0.14730  0.65418 
+
+Coefficients:
+                  Estimate Std. Error t value Pr(&gt;|t|)    
+(Intercept)       -1.11099    0.26987  -4.117 6.45e-05 ***
+Sepal.Length       0.60801    0.05024  12.101  &lt; 2e-16 ***
+Sepal.Width       -0.18052    0.08036  -2.246   0.0262 *  
+Petal.Width        0.60222    0.12144   4.959 1.97e-06 ***
+Speciesversicolor  1.46337    0.17345   8.437 3.14e-14 ***
+Speciesvirginica   1.97422    0.24480   8.065 2.60e-13 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Residual standard error: 0.2627 on 144 degrees of freedom
+Multiple R-squared:  0.9786,    Adjusted R-squared:  0.9778 
+F-statistic:  1317 on 5 and 144 DF,  p-value: &lt; 2.2e-16</code></pre>
+</div>
+</div>
+<p>Now we can use the <code>step</code> function to remove predictors that do not improve significantly the model starting from the fully specified model.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb60"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb60-1"><a href="#cb60-1" aria-hidden="true" tabindex="-1"></a>my_lm_step <span class="ot">&lt;-</span> <span class="fu">step</span>(my_lm_all)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Start:  AIC=-395.12
+Petal.Length ~ Sepal.Length + Sepal.Width + Petal.Width + Species
+
+               Df Sum of Sq     RSS     AIC
+&lt;none&gt;                       9.9397 -395.12
+- Sepal.Width   1    0.3484 10.2880 -391.95
+- Petal.Width   1    1.6974 11.6371 -373.47
+- Species       2    4.9133 14.8529 -338.87
+- Sepal.Length  1   10.1075 20.0472 -291.88</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb62"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb62-1"><a href="#cb62-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(my_lm_step)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+lm(formula = Petal.Length ~ Sepal.Length + Sepal.Width + Petal.Width + 
+    Species, data = df_iris)
+
+Residuals:
+     Min       1Q   Median       3Q      Max 
+-0.78396 -0.15708  0.00193  0.14730  0.65418 
+
+Coefficients:
+                  Estimate Std. Error t value Pr(&gt;|t|)    
+(Intercept)       -1.11099    0.26987  -4.117 6.45e-05 ***
+Sepal.Length       0.60801    0.05024  12.101  &lt; 2e-16 ***
+Sepal.Width       -0.18052    0.08036  -2.246   0.0262 *  
+Petal.Width        0.60222    0.12144   4.959 1.97e-06 ***
+Speciesversicolor  1.46337    0.17345   8.437 3.14e-14 ***
+Speciesvirginica   1.97422    0.24480   8.065 2.60e-13 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Residual standard error: 0.2627 on 144 degrees of freedom
+Multiple R-squared:  0.9786,    Adjusted R-squared:  0.9778 
+F-statistic:  1317 on 5 and 144 DF,  p-value: &lt; 2.2e-16</code></pre>
+</div>
+</div>
+<p>In this case we see that the two models coincide as the AIC would not decrease by removing any other predictor from the model.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb64"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb64-1"><a href="#cb64-1" aria-hidden="true" tabindex="-1"></a><span class="fu">AIC</span>(my_lm_all, my_lm_step)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>           df      AIC
+my_lm_all   7 32.56654
+my_lm_step  7 32.56654</code></pre>
 </div>
 </div>
 </section>

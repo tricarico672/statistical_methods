@@ -434,3 +434,27 @@ For instance, here we see that the $p$ is not small enough to reject $H_0$ and s
 ::: callout-tip
 You can understand which model is the simpler one in the table simply by looking at the residuals degrees of freedom. Knowing that those are always equal to $n-p-1$, where $p$ is the number of predictors, helps in understanding that the lower residuals' degrees of freedom will be always associated to the more complex model (i.e. the model with the higher number of $p$)
 :::
+
+### Stepwise regression
+
+We can also try and add predictors to a linear model until adding a new predictor does not improve the AIC score of the model. This can be done in the following way.
+
+First we need to specify a model with the entire set of predictors added to it.
+
+```{r}
+my_lm_all <- lm(Petal.Length ~ ., data = df_iris)
+summary(my_lm_all)
+```
+
+Now we can use the `step` function to remove predictors that do not improve significantly the model starting from the fully specified model.
+
+```{r}
+my_lm_step <- step(my_lm_all)
+summary(my_lm_step)
+```
+
+In this case we see that the two models coincide as the AIC would not decrease by removing any other predictor from the model.
+
+```{r}
+AIC(my_lm_all, my_lm_step)
+```
